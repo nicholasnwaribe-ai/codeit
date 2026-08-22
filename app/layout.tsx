@@ -1,19 +1,8 @@
 import { Analytics } from "@vercel/analytics/next"
 import type { Metadata, Viewport } from "next"
-import { Geist, JetBrains_Mono } from "next/font/google"
 import { Toaster } from "@/components/ui/sonner"
 import { SessionProvider } from "@/components/session-provider"
 import "./globals.css"
-
-const geistSans = Geist({
-  subsets: ["latin"],
-  variable: "--font-geist-sans",
-})
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: "--font-jetbrains-mono",
-})
 
 export const metadata: Metadata = {
   title: "Codeit — Share AI-generated code",
@@ -33,7 +22,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`dark bg-background ${geistSans.variable} ${jetbrainsMono.variable}`}>
+    <html lang="en" className="dark bg-background">
       <body className="font-sans antialiased">
         <SessionProvider>
           {children}

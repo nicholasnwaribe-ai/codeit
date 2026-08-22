@@ -1,10 +1,8 @@
 "use client"
 
 import { useState, FormEvent } from "react"
-import { MessageSquare, Trash2, Reply, User as UserIcon } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { MessageSquare, Trash2, Reply } from "lucide-react"
 import { addComment, deleteComment, getComments } from "@/app/actions/comments"
-import { getCurrentUser } from "@/lib/session"
 import { timeAgo } from "@/lib/format"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
@@ -25,6 +23,7 @@ interface Comment {
 interface CommentThreadProps {
   postId: number
   initialComments: Comment[]
+  currentUserId: string | null
 }
 
 function CommentItem({
@@ -82,15 +81,15 @@ function CommentForm({
   postId,
   parentId,
   onSubmit,
+  isAuthed,
 }: {
   postId: number
   parentId: number | null
   onSubmit: () => void
+  isAuthed: boolean
 }) {
   const [body, setBody] = useState("")
   const [loading, setLoading] = useState(false)
-  const router = useRouter()
-
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     if (!body.trim()) return
@@ -121,7 +120,7 @@ function CommentForm({
           rows={2}
         />
         <div className="flex items-center justify-end gap-2">
-          <Button type="submit" size="sm" disabled={loading || !body.trim()}>
+          <Button type="submit" size="sm" disabled={!isAuthed || loading || !body.trim()}>
             {loading ? "Posting…" : parentId ? "Reply" : "Comment"}
           </Button>
         </div>
@@ -132,15 +131,10 @@ function CommentForm({
   )
 }
 
-export function CommentThread({ postId, initialComments }: CommentThreadProps) {
+export function CommentThread({ postId, initialComments, currentUserId }: CommentThreadProps) {
   const [comments, setComments] = useState<Comment[]>(initialComments)
   const [replyingTo, setReplyingTo] = useState<number | null>(null)
-  const [currentUser, setCurrentUser] = useState<string | null>(null)
-
-  async function loadUser() {
-    const user = await getCurrentUser()
-    setCurrentUser(user?.id ?? null)
-  }
+  const currentUser = currentUserId
 
   async function handleAddComment() {
     const fresh = await getComments(postId)
@@ -163,7 +157,7 @@ export function CommentThread({ postId, initialComments }: CommentThreadProps) {
         Comments ({comments.length})
       </h2>
 
-      <CommentForm postId={postId} parentId={null} onSubmit={handleAddComment} />
+      <CommentForm postId={postId} parentId={null} onSubmit={handleAddComment} isAuthed={!!currentUser} />
 
       <ul className="mt-6 flex flex-col" role="list">
         {topLevel.map((comment) => (
@@ -204,6 +198,7 @@ export function CommentThread({ postId, initialComments }: CommentThreadProps) {
                     setReplyingTo(null)
                     handleAddComment()
                   }}
+                  isAuthed={!!currentUser}
                 />
               </div>
             )}

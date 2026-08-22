@@ -14,8 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Link } from "next/link"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { deletePost } from "@/app/actions/posts"
 import { toast } from "sonner"
@@ -30,19 +29,14 @@ interface PostDetailClientProps {
     userId: string
   }
   initialComments: Awaited<ReturnType<typeof import("@/components/comment-thread").getCommentData>>
+  currentUserId: string | null
 }
 
-export function PostDetailClient({ initialPost, initialComments }: PostDetailClientProps) {
+export function PostDetailClient({ initialPost, initialComments, currentUserId }: PostDetailClientProps) {
   const router = useRouter()
   const [post, setPost] = useState(initialPost)
   const [comments, setComments] = useState(initialComments)
   const [showCode, setShowCode] = useState(true)
-  const currentUser = post.authorName // placeholder - we'll get from session
-
-  async function handleVote(postId: number, value: 1 | -1) {
-    // VoteButtons handles this internally
-  }
-
   async function handleDeletePost() {
     if (!confirm("Delete this post? This cannot be undone.")) return
     try {
@@ -55,7 +49,7 @@ export function PostDetailClient({ initialPost, initialComments }: PostDetailCli
     }
   }
 
-  const isAuthor = false // TODO: get from session
+  const isAuthor = currentUserId === post.userId
 
   return (
     <article className="flex flex-col gap-6">
@@ -132,7 +126,7 @@ export function PostDetailClient({ initialPost, initialComments }: PostDetailCli
             postId={post.id}
             initialScore={Number(post.score)}
             initialVote={Number(post.myVote)}
-            isAuthed={true}
+            isAuthed={!!currentUserId}
             orientation="horizontal"
           />
           <div className="ml-4 flex items-center gap-4 text-sm text-muted-foreground">
@@ -185,7 +179,7 @@ export function PostDetailClient({ initialPost, initialComments }: PostDetailCli
         <CodeSandbox code={post.code} language={post.language} />
       )}
 
-      <CommentThread postId={post.id} initialComments={comments} />
+      <CommentThread postId={post.id} initialComments={comments} currentUserId={currentUserId} />
     </article>
   )
 }

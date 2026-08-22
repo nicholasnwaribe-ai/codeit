@@ -20,7 +20,7 @@ import {
 import { Loader2, Send } from "lucide-react"
 import { cn } from "@/lib/utils"
 
-interface Community {
+export interface Community {
   id: number
   slug: string
   name: string
@@ -97,7 +97,7 @@ export function PostForm() {
 
       <div className="space-y-2">
         <Label htmlFor="community">Community</Label>
-        <Select value={community} onValueChange={setCommunity} required>
+        <Select value={community} onValueChange={(value) => setCommunity(value ?? "")} required>
           <SelectTrigger>
             <SelectValue placeholder="Choose a community" />
           </SelectTrigger>
@@ -129,7 +129,7 @@ export function PostForm() {
       <div className="grid gap-4 md:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="language">Language</Label>
-          <Select value={language} onValueChange={setLanguage}>
+          <Select value={language} onValueChange={(value) => setLanguage(value ?? "html")}>
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
@@ -188,7 +188,7 @@ export function PostForm() {
           type="url"
         />
         <p className="text-xs text-muted-foreground">
-          Upload a short video (<25MB) using the button below, or paste a Vercel Blob URL.
+          Upload a short video (&lt;25MB) using the button below, or paste a Vercel Blob URL.
         </p>
       </div>
 

@@ -31,11 +31,10 @@ export default async function CommunityPage({ params }: Props) {
 
   if (!community) notFound()
 
-  const isMember = user
-    ? (await import("@/app/actions/communities")).getMyCommunityIds().then((ids) =>
-        ids.includes(community.id)
-      )
-    : false
+  const memberIds = user
+    ? await (await import("@/app/actions/communities")).getMyCommunityIds()
+    : []
+  const isMember = memberIds.includes(community.id)
 
   return (
     <>

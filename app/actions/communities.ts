@@ -89,7 +89,21 @@ export async function getCommunities() {
 }
 
 export async function getCommunityBySlug(slug: string) {
-  const [row] = await db.select().from(community).where(eq(community.slug, slug)).limit(1)
+  const [row] = await db
+    .select({
+      id: community.id,
+      slug: community.slug,
+      name: community.name,
+      description: community.description,
+      userId: community.userId,
+      creatorName: community.creatorName,
+      createdAt: community.createdAt,
+      memberCount: sql<number>`(select count(*) from ${membership} where ${membership.communityId} = ${community.id})`,
+      postCount: sql<number>`(select count(*) from ${post} where ${post.communityId} = ${community.id})`,
+    })
+    .from(community)
+    .where(eq(community.slug, slug))
+    .limit(1)
   return row ?? null
 }
 
