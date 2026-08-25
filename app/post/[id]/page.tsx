@@ -7,6 +7,8 @@ import { PostDetailClient } from "./post-detail-client"
 import { CommunitySidebar } from "@/components/community-sidebar"
 import { getCurrentUser } from "@/lib/session"
 
+export const dynamic = "force-dynamic"
+
 interface Props {
   params: Promise<{ id: string }>
 }
