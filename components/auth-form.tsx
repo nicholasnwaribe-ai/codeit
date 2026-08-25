@@ -4,16 +4,32 @@ import { useRouter } from "next/navigation"
 import { useState } from "react"
 import Link from "next/link"
 import { toast } from "sonner"
-import { signIn, signUp } from "@/lib/auth-client"
+import { authClient, signIn, signUp } from "@/lib/auth-client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Terminal } from "lucide-react"
+import { Globe2, Terminal } from "lucide-react"
 
 export function AuthForm({ mode }: { mode: "sign-in" | "sign-up" }) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const isSignUp = mode === "sign-up"
+
+  async function continueWithGoogle() {
+    setLoading(true)
+    const { error } = await authClient.signIn.social({
+      provider: "google",
+      callbackURL: "/",
+    })
+
+    if (error) {
+      toast.error("Could not continue with Google", {
+        description: "Check that Google sign-in is configured for this deployment.",
+      })
+      console.log("[v0] Google auth error:", error.message)
+      setLoading(false)
+    }
+  }
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -61,7 +77,25 @@ export function AuthForm({ mode }: { mode: "sign-in" | "sign-up" }) {
           : "Sign in to post, vote, and comment."}
       </p>
 
-      <form onSubmit={onSubmit} className="mt-8 flex flex-col gap-4">
+      <div className="mt-8 flex flex-col gap-4">
+        <Button
+          type="button"
+          variant="outline"
+          disabled={loading}
+          onClick={continueWithGoogle}
+          className="w-full font-medium"
+        >
+          <Globe2 className="size-4" />
+          Continue with Google
+        </Button>
+
+        <div className="flex items-center gap-3 text-xs text-muted-foreground">
+          <div className="h-px flex-1 bg-border" />
+          <span>or continue with email</span>
+          <div className="h-px flex-1 bg-border" />
+        </div>
+
+        <form onSubmit={onSubmit} className="flex flex-col gap-4">
         {isSignUp && (
           <div className="flex flex-col gap-2">
             <Label htmlFor="name">Username</Label>
@@ -87,7 +121,8 @@ export function AuthForm({ mode }: { mode: "sign-in" | "sign-up" }) {
         <Button type="submit" disabled={loading} className="mt-2 font-medium">
           {loading ? "Please wait…" : isSignUp ? "Create account" : "Sign in"}
         </Button>
-      </form>
+        </form>
+      </div>
 
       <p className="mt-6 text-center text-sm text-muted-foreground">
         {isSignUp ? "Already have an account? " : "New to Codeit? "}
