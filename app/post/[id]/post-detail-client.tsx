@@ -66,7 +66,7 @@ export function PostDetailClient({ initialPost, initialComments, currentUserId }
             {post.authorName}
           </Link>
           <span aria-hidden>·</span>
-          <span>{timeAgo(post.createdAt)} ago</span>
+          <span suppressHydrationWarning>{timeAgo(post.createdAt)} ago</span>
           {isAuthor && (
             <>
               <span aria-hidden>·</span>

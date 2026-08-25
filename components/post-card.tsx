@@ -47,7 +47,7 @@ export function PostCard({ post, isAuthed }: { post: FeedPost; isAuthed: boolean
             </Link>
           </span>
           <span aria-hidden>·</span>
-          <span>{timeAgo(post.createdAt)} ago</span>
+          <span suppressHydrationWarning>{timeAgo(post.createdAt)} ago</span>
         </div>
 
         <Link href={`/post/${post.id}`} className="mt-1 block">
