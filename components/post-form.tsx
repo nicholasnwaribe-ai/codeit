@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { createPost } from "@/app/actions/posts"
 import { getCommunities } from "@/app/actions/communities"
@@ -41,10 +41,11 @@ export function PostForm() {
   const [demoUrl, setDemoUrl] = useState("")
   const [community, setCommunity] = useState("")
 
-  async function loadCommunities() {
-    const data = await getCommunities()
-    setCommunities(data)
-  }
+  useEffect(() => {
+    getCommunities()
+      .then(setCommunities)
+      .catch(() => toast.error("Could not load communities"))
+  }, [])
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
